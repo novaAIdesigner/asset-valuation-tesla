@@ -84,36 +84,12 @@ export default function ValuationSimulator() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl p-6">
-        <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-              <Activity className="text-blue-500" />
-              Tesla 市值模拟器（DCF + Monte Carlo）
-            </h1>
-            <p className="mt-1 text-sm text-slate-400">2025-2027 业务驱动假设 → 现金流折现 → 估值分布</p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2">
-              <div className="text-[11px] text-slate-500">Monte Carlo</div>
-              <input
-                type="number"
-                value={mcIterations}
-                min={200}
-                step={100}
-                onChange={(e) => setMcIterations(Number(e.target.value))}
-                className="w-28 bg-transparent text-sm text-slate-100 outline-none"
-              />
-            </div>
-            <button
-              onClick={handleRunMonteCarlo}
-              disabled={isMonteCarloRunning}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-            >
-              <RefreshCw className={`h-4 w-4 ${isMonteCarloRunning ? 'animate-spin' : ''}`} />
-              运行模拟
-            </button>
-          </div>
+        <header className="mb-6">
+          <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
+            <Activity className="text-blue-500" />
+            Tesla 市值模拟器（DCF + Monte Carlo）
+          </h1>
+          <p className="mt-1 text-sm text-slate-400">2025-2027 业务驱动假设 → 现金流折现 → 估值分布</p>
         </header>
 
         {/* Top: Macro + Scenarios */}
@@ -134,6 +110,46 @@ export default function ValuationSimulator() {
           <ServicesModule value={params.services} onChange={(services) => setParams((p) => ({ ...p, services }))} />
           <RobotaxiModule value={params.robotaxi} onChange={(robotaxi) => setParams((p) => ({ ...p, robotaxi }))} />
           <OptimusModule value={params.optimus} onChange={(optimus) => setParams((p) => ({ ...p, optimus }))} />
+        </div>
+
+        {/* Simulation Controls & Explanation */}
+        <div className="mt-8 mb-8 rounded-xl border border-blue-900/30 bg-blue-950/10 p-6">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1">
+              <h3 className="flex items-center gap-2 text-lg font-medium text-blue-100">
+                <Activity className="h-5 w-5 text-blue-400" />
+                运行原理与模拟
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400 max-w-3xl">
+                本模型首先基于上述假设计算<strong>确定性 DCF 估值</strong>（即下方显示的“DCF 估算股价”）。
+                <br />
+                点击“运行模拟”后，系统将执行 <strong>Monte Carlo 模拟</strong>：对销量、ASP、毛利率等关键参数施加随机扰动（正态分布），
+                并根据 Robotaxi/Optimus 的成功概率进行数千次独立推演，最终生成股价的概率分布区间（P10/中位数/P90）。
+              </p>
+            </div>
+
+            <div className="flex flex-col items-end gap-3 min-w-[240px]">
+              <div className="flex w-full items-center justify-between rounded-lg border border-slate-800 bg-slate-950/60 px-4 py-2">
+                <span className="text-xs text-slate-500">模拟次数</span>
+                <input
+                  type="number"
+                  value={mcIterations}
+                  min={500}
+                  step={500}
+                  onChange={(e) => setMcIterations(Number(e.target.value))}
+                  className="w-20 bg-transparent text-right text-sm font-semibold text-slate-200 outline-none"
+                />
+              </div>
+              <button
+                onClick={handleRunMonteCarlo}
+                disabled={isMonteCarloRunning}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-500 hover:shadow-blue-900/40 disabled:opacity-50"
+              >
+                <RefreshCw className={`h-5 w-5 ${isMonteCarloRunning ? 'animate-spin' : ''}`} />
+                开始 Monte Carlo 模拟
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Bottom: Simulation + Results */}
